@@ -1,142 +1,117 @@
-# SentraGuard AI
 
-**SentraGuard AI** adalah aplikasi berbasis **Laravel 12** yang berfungsi untuk melakukan *pemindaian keamanan website* secara otomatis.
-Aplikasi ini membantu pengguna mendeteksi kelemahan dasar dari konfigurasi web, seperti header keamanan, HTTPS, dan potensi redirect mencurigakan, kemudian memberikan **analisis dan rekomendasi perbaikan menggunakan kecerdasan buatan (AI).**
+##  **PrismLab — API Testing & Local Web Security Testing Toolkit**
 
----
+**PrismLab** adalah aplikasi web yang membantu developer melakukan **pengujian API** dan **pemeriksaan keamanan web dasar**, serta menyediakan lingkungan aman untuk menguji serangan web **khusus pada server lokal**.
 
-## Fitur Utama
-
-* **Pemindaian Website Otomatis**
-
-  * Cukup masukkan URL, sistem akan menganalisis status HTTPS, header keamanan (`CSP`, `X-Frame-Options`, `HSTS`, dll), dan pola redirect.
-
-* **Analisis AI & Rekomendasi Perbaikan**
-
-  * Menggunakan API AI (gemini atau model serupa) untuk memberikan saran spesifik:
-
-    * Apa risiko dari konfigurasi saat ini
-    * Langkah teknis untuk memperbaikinya
-    * Contoh konfigurasi aman (misal contoh CSP header)
-
-* 📊 **Skor Keamanan (0–100)**
-
-  * Sistem menilai tingkat keamanan website berdasarkan hasil pemindaian dan header yang ditemukan.
-
-* 📈 **Dashboard Visualisasi**
-
-  * Tampilan hasil pemindaian dalam bentuk grafik (Chart.js)
-  * Riwayat hasil scan tersimpan dan dapat dilihat ulang
-
-* **Autentikasi & Manajemen Pengguna**
-
-  * Setiap pengguna memiliki akun untuk menyimpan hasil pemindaian mereka.
+Aplikasi ini menggabungkan kemampuan utama seperti alat uji API dan fitur pengecekan keamanan ringan untuk membantu proses development, debugging, dan pembelajaran cybersecurity secara aman dan legal.
 
 ---
 
-## Teknologi yang Digunakan
+# **Fitur Utama**
 
-| Komponen          | Teknologi                      |
-| ----------------- | ------------------------------ |
-| Framework Backend | Laravel 12                     |
-| Frontend          | Blade / TailwindCSS / Chart.js |
-| HTTP Client       | Guzzle (Laravel HTTP Facade)   |
-| AI Integration    | Gemini API                     |
-| Database          | PostgreSQL                     |
-| Authentication    | Laravel Breeze                 |
-| Version Control   | Git & GitHub                   |
+## **1. API Tester (Postman Lite)**
 
----
+Fitur untuk menguji endpoint API secara cepat dan efisien.
 
-## Arsitektur Sederhana
+### Fitur API Tester:
 
-```text
-┌───────────────────────────┐
-│        User Input         │
-│        (URL target)       │
-└────────────┬──────────────┘
-             │
-             ▼
-┌───────────────────────────┐
-│   ScanController          │
-│ - Validasi URL            │
-│ - HTTP Request (Guzzle)   │
-│ - Analisis Header & HTTPS │
-│ - Skor Keamanan           │
-└────────────┬──────────────┘
-             │
-             ▼
-┌───────────────────────────┐
-│     AI Analyzer (API)     │
-│ - Kirim hasil scan ke AI  │
-│ - Terima saran perbaikan  │
-└────────────┬──────────────┘
-             │
-             ▼
-┌───────────────────────────┐
-│  Dashboard & History UI   │
-│ - Chart & Detail Temuan   │
-│ - AI Recommendation View  │
-└───────────────────────────┘
-```
+* Pilihan metode: GET, POST, PUT, DELETE
+* Input URL
+* Custom headers
+* Input body JSON
+* Melihat hasil response:
+
+  * Status Code
+  * Response Time
+  * Response Headers
+  * Response Body (formatted & raw)
+* Seluruh request disimpan ke database sebagai riwayat
 
 ---
 
-## Skor Keamanan
+## **2. Web Security Testing (Local Only)**
 
-| Komponen                      | Bobot | Keterangan                          |
-| ----------------------------- | ----- | ----------------------------------- |
-| HTTPS & Sertifikat Valid      | 30    | Keamanan koneksi                    |
-| Header HSTS                   | 15    | Menegakkan HTTPS                    |
-| CSP (Content Security Policy) | 20    | Cegah XSS                           |
-| X-Frame-Options               | 10    | Cegah Clickjacking                  |
-| X-Content-Type-Options        | 5     | Validasi MIME                       |
-| Redirect Aman                 | 10    | Hindari open redirect               |
-| Header Tambahan               | 10    | Referrer-Policy, Permissions-Policy |
+PrismLab menyediakan fitur pemeriksaan keamanan dasar pada website, tetapi **dibatasi hanya untuk server lokal** (localhost atau jaringan private). Pembatasan ini dibuat untuk memastikan penggunaan tetap aman dan sesuai hukum.
 
----
+### Fitur Security Testing:
 
-## Contoh Output AI
+#### **SSL Check**
 
-```json
-{
-  "summary": "Website menggunakan HTTPS namun belum memiliki Content-Security-Policy dan HSTS.",
-  "findings": [
-    {
-      "title": "Missing Content-Security-Policy",
-      "severity": "high",
-      "recommend": "Tambahkan CSP untuk membatasi sumber script.",
-      "example_config": "Content-Security-Policy: default-src 'self'; script-src 'self';"
-    },
-    {
-      "title": "HSTS Header Not Found",
-      "severity": "medium",
-      "recommend": "Tambahkan Strict-Transport-Security untuk memaksa HTTPS.",
-      "example_config": "Strict-Transport-Security: max-age=31536000; includeSubDomains"
-    }
-  ],
-  "score": 65
-}
-```
+* Deteksi apakah HTTPS digunakan
+* Validitas sertifikat SSL
+* Informasi tanggal kedaluwarsa SSL
+
+#### **Security Headers Check**
+
+Pemeriksaan terhadap header keamanan penting:
+
+* Content-Security-Policy
+* Strict-Transport-Security
+* X-Frame-Options
+* X-Content-Type-Options
+* Referrer-Policy
+
+####  **Sensitive File Exposure Check**
+
+Mendeteksi keberadaan file sensitif (khusus target lokal):
+
+* `/.env`
+* `/phpinfo.php`
+* `/backup.zip`
+
+> Fitur ini **tidak dapat digunakan pada website publik**.
+> PrismLab otomatis menolak URL non-local.
 
 ---
 
+## **3. Local Attack Playground**
 
+PrismLab menyediakan lingkungan khusus untuk menguji serangan dasar, tetapi **hanya pada server lokal** yang dibuat dan dikontrol pengguna.
 
-## Disclaimer
+Fitur serangan yang tersedia di local mode:
 
-Aplikasi ini **tidak melakukan serangan atau eksploitasi aktif**.
-Semua pemeriksaan bersifat **pasif**, hanya membaca header dan konfigurasi publik.
-Gunakan **SentraGuard AI** untuk edukasi dan keamanan website **yang Anda miliki atau telah mendapat izin eksplisit.**
+* SQL Injection Testing (error-based)
+* XSS Testing (reflected)
+* Directory brute-force (wordlist dasar)
+* Brute-force login simulasi
+* Parameter fuzzing
+* Command injection testing (simulasi)
+
+PrismLab membatasi target:
+
+* Hanya `localhost`, `127.0.0.1`, dan jaringan private
+* URL di luar ini akan ditolak
+
+Dengan demikian, fitur serangan tidak dapat disalahgunakan.
 
 ---
 
-## Tujuan Proyek
+## **4. Dashboard**
 
-> Memberikan sarana pembelajaran interaktif untuk mahasiswa dan profesional di bidang keamanan web agar dapat memahami:
->
-> * pentingnya konfigurasi header,
-> * deteksi kesalahan umum pada server,
-> * dan bagaimana kecerdasan buatan dapat membantu proses audit keamanan dasar.
+Dashboard menampilkan informasi ringkas:
+
+* Jumlah total API request
+* Jumlah total security scan
+* Riwayat penggunaan terbaru
+* Ringkasan aktivitas pengguna
 
 ---
+
+## **5. Database Integration**
+
+PrismLab menyimpan:
+
+* Riwayat pengujian API
+* Riwayat pemeriksaan keamanan
+* Catatan aktivitas attack tool (local mode)
+* Data pengguna
+
+Tabel yang digunakan:
+
+* `users`
+* `api_requests`
+* `security_scans`
+* `attack_logs`
+
+---
+
